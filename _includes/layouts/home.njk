@@ -1,33 +1,40 @@
 ---
 layout: layouts/base.njk
 ---
+
+{% macro renderNav(items) %}
+  <ul class="list pl0 flex flex-column lh-copy">
+    {% for item in items %}
+      <li class="mb2">
+        <a href="{{ item.url }}" class="link dim black f5 lh-copy tl">
+          {{ item.data.title }}
+        </a>
+        {% if item.children %}
+          {{ renderNav(item.children) }}
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% endmacro %}
+
 <div class="sans-serif">
-  <!-- Site Title as link -->
-  <div class="pa4">
-    <a href="/" class="link dim black f2 fw6 ma0 tl db">
+
+  <!-- Site Title as link + mobile hamburger button -->
+  <div class="pa4 flex items-center justify-between">
+    <a href="/" class="link dim black f3 f2-ns fw6 ma0 tl db">
       Home
     </a>
+
+    <!-- Hamburger button visible on mobile only -->
+    <button id="nav-toggle" class="dib dn-ns bn bg-transparent pa2 pointer">
+      <svg class="w2 h2" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18" stroke="#000" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
   </div>
 
   <!-- Two-column layout -->
   <div class="flex flex-column flex-row-ns">
-    {% macro renderNav(items) %}
-      <ul class="list pl0 flex flex-column lh-copy">
-        {% for item in items %}
-          <li class="mb2">
-            <a href="{{ item.url }}" class="link dim black f6 lh-copy tl">
-              {{ item.data.title }}
-            </a>
-            {% if item.children %}
-              {{ renderNav(item.children) }}
-            {% endif %}
-          </li>
-        {% endfor %}
-      </ul>
-    {% endmacro %}
-
-    <!-- Sidebar nav -->
-    <nav class="w-100 w-25-ns pa4">
+    <!-- Sidebar nav: hidden on mobile until toggle -->
+    <nav id="sidebar" class="w-100 w-25-ns pa4 dn dn-ns flex-ns">
       {{ renderNav(collections.all | eleventyNavigation) }}
     </nav>
 
@@ -39,3 +46,15 @@ layout: layouts/base.njk
     </main>
   </div>
 </div>
+
+<script>
+  // Simple mobile nav toggle
+  document.addEventListener('DOMContentLoaded', function() {
+    const toggle = document.getElementById('nav-toggle');
+    const sidebar = document.getElementById('sidebar');
+    toggle.addEventListener('click', () => {
+      sidebar.classList.toggle('dn');
+    });
+  });
+</script>
+
