@@ -1,0 +1,27 @@
+---
+layout: layouts/base.njk
+---
+<div class="flex flex-column flex-row-ns">
+  {% macro renderNav(items) %}
+    <ul class="list pl0 flex flex-column">
+      {% for item in items %}
+        <li class="mb2">
+          <a href="{{ item.url }}" class="link dim black f4 tl">
+            {{ item.title }}
+          </a>
+          {% if item.children %}
+            {{ renderNav(item.children) }}
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% endmacro %}
+
+  <nav class="w-100 w-25-ns pa3">
+    {{ renderNav(collections.all | eleventyNavigation) }}
+  </nav>
+
+  <div class="w-100 w-75-ns pa3">
+      {{ content | safe }}
+  </div>
+</div>
