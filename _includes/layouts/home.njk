@@ -1,27 +1,41 @@
 ---
 layout: layouts/base.njk
 ---
-<div class="flex flex-column flex-row-ns">
-  {% macro renderNav(items) %}
-    <ul class="list pl0 flex flex-column">
-      {% for item in items %}
-        <li class="mb2">
-          <a href="{{ item.url }}" class="link dim black f4 tl">
-            {{ item.title }}
-          </a>
-          {% if item.children %}
-            {{ renderNav(item.children) }}
-          {% endif %}
-        </li>
-      {% endfor %}
-    </ul>
-  {% endmacro %}
+<div class="sans-serif">
+  <!-- Site Title as link -->
+  <div class="pa4">
+    <a href="/" class="link dim black f2 fw6 ma0 tl db">
+      Home
+    </a>
+  </div>
 
-  <nav class="w-100 w-25-ns pa3">
-    {{ renderNav(collections.all | eleventyNavigation) }}
-  </nav>
+  <!-- Two-column layout -->
+  <div class="flex flex-column flex-row-ns">
+    {% macro renderNav(items) %}
+      <ul class="list pl0 flex flex-column lh-copy">
+        {% for item in items %}
+          <li class="mb2">
+            <a href="{{ item.url }}" class="link dim black f6 lh-copy tl">
+              {{ item.data.title }}
+            </a>
+            {% if item.children %}
+              {{ renderNav(item.children) }}
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% endmacro %}
 
-  <div class="w-100 w-75-ns pa3">
-      {{ content | safe }}
+    <!-- Sidebar nav -->
+    <nav class="w-100 w-25-ns pa4">
+      {{ renderNav(collections.all | eleventyNavigation) }}
+    </nav>
+
+    <!-- Main content -->
+    <main class="w-100 w-75-ns pa4 lh-copy">
+      <heading-anchors>
+        {{ content | safe }}
+      </heading-anchors>
+    </main>
   </div>
 </div>
