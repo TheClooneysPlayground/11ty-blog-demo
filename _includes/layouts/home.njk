@@ -3,10 +3,11 @@ layout: layouts/base.njk
 ---
 
 {% macro renderNav(items) %}
-  <ul class="list pl0 flex flex-column lh-copy">
+  <ul class="list pl0 ma0 pa0 flex flex-column lh-copy items-end">
     {% for item in items %}
-      <li class="mb2">
-        <a href="{{ item.url }}" class="link dim black f5 lh-copy tl">
+      <li class="mb2 w-100">
+        <a href="{{ item.url }}"
+           class="db pa3 link dim black f5 lh-copy tr tl-ns">
           {{ item.data.title }}
         </a>
         {% if item.children %}
@@ -18,14 +19,11 @@ layout: layouts/base.njk
 {% endmacro %}
 
 <div class="sans-serif">
-
-  <!-- Site Title as link + mobile hamburger button -->
-  <div class="pa4 flex items-center justify-between">
-    <a href="/" class="link dim black f3 f2-ns fw6 ma0 tl db">
+  <!-- Site Title + Mobile Hamburger -->
+  <div class="pa4 flex items-center justify-between bg-white">
+    <a href="/" class="link dim black f3 f2-ns fw6 ma0 tr tl-ns db">
       Home
     </a>
-
-    <!-- Hamburger button visible on mobile only -->
     <button id="nav-toggle" class="dib dn-ns bn bg-transparent pa2 pointer">
       <svg class="w2 h2" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18" stroke="#000" stroke-width="2" stroke-linecap="round"/></svg>
     </button>
@@ -34,7 +32,7 @@ layout: layouts/base.njk
   <!-- Two-column layout -->
   <div class="flex flex-column flex-row-ns">
     <!-- Sidebar nav: hidden on mobile until toggle -->
-    <nav id="sidebar" class="w-100 w-25-ns pa4 dn dn-ns flex-ns">
+    <nav id="sidebar" class="w-100 w-25-ns pa4 dn dn-ns flex-ns bg-light-gray">
       {{ renderNav(collections.all | eleventyNavigation) }}
     </nav>
 
@@ -48,13 +46,9 @@ layout: layouts/base.njk
 </div>
 
 <script>
-  // Simple mobile nav toggle
   document.addEventListener('DOMContentLoaded', function() {
-    const toggle = document.getElementById('nav-toggle');
-    const sidebar = document.getElementById('sidebar');
-    toggle.addEventListener('click', () => {
-      sidebar.classList.toggle('dn');
+    document.getElementById('nav-toggle').addEventListener('click', function() {
+      document.getElementById('sidebar').classList.toggle('dn');
     });
   });
 </script>
-
