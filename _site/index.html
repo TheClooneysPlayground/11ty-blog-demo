@@ -20,12 +20,34 @@
 
 
 <div class="sans-serif">
+  <style>
+    /* Fade + Slide Keyframe Animations */
+    @keyframes slideFadeIn {
+      from { transform: translateY(-10px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    @keyframes slideFadeOut {
+      from { transform: translateY(0); opacity: 1; }
+      to { transform: translateY(-10px); opacity: 0; }
+    }
+    #sidebar {
+      /* Ensure the nav is hidden initially on mobile */
+      display: none;
+    }
+    .slide-fade-in {
+      animation: slideFadeIn 0.3s ease forwards;
+    }
+    .slide-fade-out {
+      animation: slideFadeOut 0.3s ease forwards;
+    }
+  </style>
+
   <!-- Site Title + Mobile Hamburger -->
   <div class="pa4 flex items-center justify-between bg-white">
     <a href="/" class="link dim black f3 f2-ns fw6 ma0 tr tl-ns db">
       Home
     </a>
-    <button id="nav-toggle" class="dib dn-ns bn bg-transparent pa2 pointer">
+    <button id="nav-toggle" class="dib dn-ns bn bg-transparent pa2 pointer" aria-expanded="false" aria-controls="sidebar">
       <svg class="w2 h2" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18" stroke="#000" stroke-width="2" stroke-linecap="round"/></svg>
     </button>
   </div>
@@ -33,7 +55,7 @@
   <!-- Two-column layout -->
   <div class="flex flex-column flex-row-ns">
     <!-- Sidebar nav: hidden on mobile until toggle -->
-    <nav id="sidebar" class="w-100 w-25-ns pa4 dn dn-ns flex-ns bg-light-gray">
+    <nav id="sidebar" class="w-100 w-25-ns pa4 bg-light-gray">
       
   <ul class="list pl0 ma0 pa0 flex flex-column lh-copy items-end">
     
@@ -81,8 +103,28 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('nav-toggle').addEventListener('click', function() {
-      document.getElementById('sidebar').classList.toggle('dn');
+    const btn = document.getElementById('nav-toggle');
+    const sidebar = document.getElementById('sidebar');
+
+    // Toggle with animation
+    btn.addEventListener('click', function() {
+      const isOpen = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', String(!isOpen));
+
+      if (!isOpen) {
+        // Show and animate in
+        sidebar.style.display = 'block';
+        sidebar.classList.remove('slide-fade-out');
+        sidebar.classList.add('slide-fade-in');
+      } else {
+        // Animate out, then hide after animation
+        sidebar.classList.remove('slide-fade-in');
+        sidebar.classList.add('slide-fade-out');
+        sidebar.addEventListener('animationend', function handler() {
+          sidebar.style.display = 'none';
+          sidebar.removeEventListener('animationend', handler);
+        });
+      }
     });
   });
 </script>
