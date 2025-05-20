@@ -30,12 +30,8 @@
       from { transform: translateY(0); opacity: 1; }
       to { transform: translateY(-10px); opacity: 0; }
     }
-    .slide-fade-in {
-      animation: slideFadeIn 0.3s ease forwards;
-    }
-    .slide-fade-out {
-      animation: slideFadeOut 0.3s ease forwards;
-    }
+    .slide-fade-in { animation: slideFadeIn 0.3s ease forwards; }
+    .slide-fade-out { animation: slideFadeOut 0.3s ease forwards; }
   </style>
 
   <!-- Site Title + Mobile Hamburger -->
@@ -44,13 +40,18 @@
       Home
     </a>
     <button id="nav-toggle" class="dib dn-ns bn bg-transparent pa2 pointer" aria-expanded="false" aria-controls="sidebar">
-      <svg class="w2 h2" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18" stroke="#000" stroke-width="2" stroke-linecap="round"/></svg>
+      <svg id="icon-hamburger" class="w2 h2" viewBox="0 0 24 24">
+        <path d="M3 6h18M3 12h18M3 18h18" stroke="#000" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <svg id="icon-close" class="w2 h2" viewBox="0 0 24 24" style="display:none;">
+        <path d="M6 6l12 12M6 18L18 6" stroke="#000" stroke-width="2" stroke-linecap="round"/>
+      </svg>
     </button>
   </div>
 
   <!-- Two-column layout -->
   <div class="flex flex-column flex-row-ns">
-    <!-- Sidebar nav: hidden on mobile until toggle; gray bg only mobile, transparent on desktop -->
+    <!-- Sidebar nav: hidden on mobile until toggle -->
     <nav id="sidebar" class="dn db-ns w-100 w-25-ns pa4">
       
   <ul class="list pl0 ma0 pa0 flex flex-column lh-copy items-end">
@@ -101,18 +102,23 @@
   document.addEventListener('DOMContentLoaded', function() {
     const btn = document.getElementById('nav-toggle');
     const sidebar = document.getElementById('sidebar');
+    const iconHamburger = document.getElementById('icon-hamburger');
+    const iconClose = document.getElementById('icon-close');
 
     btn.addEventListener('click', function() {
       const isOpen = btn.getAttribute('aria-expanded') === 'true';
       btn.setAttribute('aria-expanded', String(!isOpen));
+      // Toggle icons
+      iconHamburger.style.display = isOpen ? 'block' : 'none';
+      iconClose.style.display     = isOpen ? 'none'  : 'block';
 
       if (!isOpen) {
-        // remove mobile-hide class, animate in
+        // open menu
         sidebar.classList.remove('dn');
         sidebar.classList.remove('slide-fade-out');
         sidebar.classList.add('slide-fade-in');
       } else {
-        // animate out, then hide
+        // close menu
         sidebar.classList.remove('slide-fade-in');
         sidebar.classList.add('slide-fade-out');
         sidebar.addEventListener('animationend', function handler() {
@@ -123,7 +129,6 @@
     });
   });
 </script>
-
 			</heading-anchors>
 		</main>
 
