@@ -49,8 +49,8 @@ layout: layouts/base.njk
 
   <!-- Two-column layout -->
   <div class="flex flex-column flex-row-ns">
-    <!-- Sidebar nav: hidden on mobile until toggle -->
-    <nav id="sidebar" class="dn db-ns w-100 w-25-ns pa4 bg-light-gray">
+    <!-- Sidebar nav: hidden on mobile until toggle; gray bg only mobile, transparent on desktop -->
+    <nav id="sidebar" class="dn db-ns w-100 w-25-ns pa4">
       {{ renderNav(collections.all | eleventyNavigation) }}
     </nav>
 
