@@ -29,10 +29,6 @@ layout: layouts/base.njk
       from { transform: translateY(0); opacity: 1; }
       to { transform: translateY(-10px); opacity: 0; }
     }
-    #sidebar {
-      /* Ensure the nav is hidden initially on mobile */
-      display: none;
-    }
     .slide-fade-in {
       animation: slideFadeIn 0.3s ease forwards;
     }
@@ -54,7 +50,7 @@ layout: layouts/base.njk
   <!-- Two-column layout -->
   <div class="flex flex-column flex-row-ns">
     <!-- Sidebar nav: hidden on mobile until toggle -->
-    <nav id="sidebar" class="w-100 w-25-ns pa4 bg-light-gray">
+    <nav id="sidebar" class="dn db-ns w-100 w-25-ns pa4 bg-light-gray">
       {{ renderNav(collections.all | eleventyNavigation) }}
     </nav>
 
@@ -72,22 +68,21 @@ layout: layouts/base.njk
     const btn = document.getElementById('nav-toggle');
     const sidebar = document.getElementById('sidebar');
 
-    // Toggle with animation
     btn.addEventListener('click', function() {
       const isOpen = btn.getAttribute('aria-expanded') === 'true';
       btn.setAttribute('aria-expanded', String(!isOpen));
 
       if (!isOpen) {
-        // Show and animate in
-        sidebar.style.display = 'block';
+        // remove mobile-hide class, animate in
+        sidebar.classList.remove('dn');
         sidebar.classList.remove('slide-fade-out');
         sidebar.classList.add('slide-fade-in');
       } else {
-        // Animate out, then hide after animation
+        // animate out, then hide
         sidebar.classList.remove('slide-fade-in');
         sidebar.classList.add('slide-fade-out');
         sidebar.addEventListener('animationend', function handler() {
-          sidebar.style.display = 'none';
+          sidebar.classList.add('dn');
           sidebar.removeEventListener('animationend', handler);
         });
       }
