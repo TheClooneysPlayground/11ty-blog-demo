@@ -63,7 +63,9 @@ layout: layouts/base.njk
 
   <!-- Site Title + Mobile Hamburger -->
   <div class="pa4 flex items-center justify-between bg-white">
-    <a href="/" class="link dim black f3 f2-ns fw6 ma0 tr tl-ns db">Home</a>
+    <a href="/" class="link dim black f3 f2-ns fw6 ma0 tr tl-ns db">
+      {{ site.title }}
+    </a>
     <button id="nav-toggle" class="dib dn-ns bn bg-transparent pa2 pointer" aria-expanded="false" aria-controls="sidebar">
       <div class="burger">
         <div class="top-bun"></div>
