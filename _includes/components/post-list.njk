@@ -11,7 +11,7 @@
             {% if item.data.excerpt %}
               {{ item.data.excerpt | safe }}
             {% else %}
-              {{ item.templateContent | excerpt(1) | safe }}
+              {{ item.templateContent | excerpt(2) | safe }}
             {% endif %}
           </div>
         </article>
