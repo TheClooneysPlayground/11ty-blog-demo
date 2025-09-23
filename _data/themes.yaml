@@ -1,0 +1,35 @@
+- id: default
+  label: Default
+  classes:
+    - black
+    - bg-white
+- id: sun
+  label: Sun (black / washed-yellow)
+  classes:
+    - black
+    - bg-washed-yellow
+- id: mint
+  label: Mint (black / washed-green)
+  classes:
+    - black
+    - bg-washed-green
+- id: charcoal
+  label: Charcoal (near-white / mid-gray)
+  classes:
+    - near-white
+    - bg-mid-gray
+- id: grape
+  label: Grape (near-white / purple)
+  classes:
+    - near-white
+    - bg-purple
+- id: midnight
+  label: Midnight (near-white / navy)
+  classes:
+    - near-white
+    - bg-navy
+- id: deep-blue
+  label: Deep Blue (white / dark-blue)
+  classes:
+    - white
+    - bg-dark-blue

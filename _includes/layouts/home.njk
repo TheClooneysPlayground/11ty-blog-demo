@@ -7,7 +7,7 @@ layout: layouts/base.njk
     {% for item in items %}
       <li class="mb2 w-100">
         <a href="{{ item.url }}"
-           class="db pa3 link dim black f5 lh-copy tr tl-ns">
+           class="db pa3 link dim f5 lh-copy tr tl-ns theme-text">
           {{ item.data.title }}
         </a>
         {% if item.children %}
@@ -17,6 +17,9 @@ layout: layouts/base.njk
     {% endfor %}
   </ul>
 {% endmacro %}
+
+{% set siteThemeConfig = site.theme or {} %}
+{% set showThemeSelectors = siteThemeConfig.showSelectors if siteThemeConfig.showSelectors is defined else true %}
 
 <div class="sans-serif">
   <style>
@@ -59,20 +62,57 @@ layout: layouts/base.njk
       transform: translateY(-6px) rotate(-45deg);
       width: 100%;
     }
+
+    [data-theme-preview] {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    [data-theme-preview]:focus {
+      outline: none;
+    }
+    [data-theme-preview][data-active] {
+      box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.35);
+    }
+    [data-theme-preview]:hover {
+      transform: translateY(-2px);
+    }
+
+    .theme .theme-text,
+    .theme .theme-text:visited,
+    .theme .theme-text:hover,
+    .theme .theme-text:focus,
+    .theme .theme-text:active {
+      color: inherit;
+    }
   </style>
 
   <!-- Site Title + Mobile Hamburger -->
-  <div class="pa4 flex items-center justify-between bg-white">
-    <a href="/" class="link dim black f3 f2-ns fw6 ma0 tr tl-ns db">
+  <div class="pa4 flex items-center justify-between flex-wrap">
+    <a href="/" class="link dim f3 f2-ns fw6 ma0 tr tl-ns db theme-text">
       {{ site.title }}
     </a>
-    <button id="nav-toggle" class="dib dn-ns bn bg-transparent pa2 pointer" aria-expanded="false" aria-controls="sidebar">
-      <div class="burger">
-        <div class="top-bun"></div>
-        <div class="patty"></div>
-        <div class="bottom-bun"></div>
+    <div class="flex items-center mt3 mt0-ns flex-wrap justify-end">
+      {% if showThemeSelectors %}
+      <div class="flex items-center flex-wrap">
+        {% for theme in themes %}
+          <button type="button"
+                  class="w2 h2 bn pointer br2 mr2 mb2 pa0 ba b--transparent bg-transparent flex items-center justify-center"
+                  data-theme-preview="{{ theme.id }}"{% if loop.first %} data-active{% endif %}
+                  aria-label="Preview {{ theme.label }} theme">
+            <span class="w-100 h-100 br2 flex items-center justify-center {{ theme.classes | join(' ') }}">
+              Aa
+            </span>
+          </button>
+        {% endfor %}
       </div>
-    </button>
+      {% endif %}
+      <button id="nav-toggle" class="dib dn-ns bn bg-transparent pa2 pointer{% if showThemeSelectors %} ml3{% endif %} mt2 mt0-ns" aria-expanded="false" aria-controls="sidebar">
+        <div class="burger">
+          <div class="top-bun"></div>
+          <div class="patty"></div>
+          <div class="bottom-bun"></div>
+        </div>
+      </button>
+    </div>
   </div>
 
   <!-- Two-column layout -->

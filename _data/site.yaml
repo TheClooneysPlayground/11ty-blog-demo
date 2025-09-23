@@ -3,3 +3,10 @@ url: https://11ty-blog-demo.pages.dev/
 author:
   name: Nicholas Clooney
   email: not-gonna-tell-you@nicholas-clooney.simplelogin.com # 😉 You can still reach me.
+theme:
+  showSelectors: true
+  previewResetDelay: 200
+  transitionDuration: 0.5s
+   # all options: linear, ease, ease-in, ease-out, ease-in-out
+  transitionTimingFunction: ease-in-out
+  defaultId: sun
