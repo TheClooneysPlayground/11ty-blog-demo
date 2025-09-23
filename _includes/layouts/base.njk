@@ -11,6 +11,7 @@
 		{% endfor %}
 	{% endif %}
 	{% set defaultThemeClasses = defaultTheme.classes | join(' ') %}
+	{% set defaultThemeMidtoneClass = defaultTheme.midtoneClass if defaultTheme.midtoneClass is defined else 'mid-gray' %}
 	{% set previewResetDelay = siteThemeConfig.previewResetDelay if siteThemeConfig.previewResetDelay is defined else 200 %}
 	{% set transitionDuration = siteThemeConfig.transitionDuration if siteThemeConfig.transitionDuration is defined else '0.35s' %}
 	{% set transitionTimingFunction = siteThemeConfig.transitionTimingFunction if siteThemeConfig.transitionTimingFunction is defined else 'ease' %}
@@ -34,6 +35,9 @@
 				body.theme [data-theme-preview] span {
 					transition: color {{ transitionDuration }} {{ transitionTimingFunction }}, background-color {{ transitionDuration }} {{ transitionTimingFunction }};
 				}
+				body.theme .theme-midtone {
+					transition: color {{ transitionDuration }} {{ transitionTimingFunction }};
+				}
 			</style>
 	</head>
 	<body class="theme {{ defaultThemeClasses }}" data-theme="{{ defaultTheme.id }}" data-default-theme="{{ defaultTheme.id }}">
@@ -49,12 +53,32 @@
 				map[theme.id] = theme.classes;
 				return map;
 			}, {});
+			const defaultMidtoneClass = {{ defaultThemeMidtoneClass | dump | safe }};
+			const themeMidtoneMap = themeConfig.reduce((map, theme) => {
+				const className = theme.midtoneClass || defaultMidtoneClass;
+				map[theme.id] = className;
+				return map;
+			}, {});
 			const allThemeClasses = Array.from(new Set(themeConfig.flatMap(theme => theme.classes)));
+			const allMidtoneClasses = Array.from(new Set([
+				defaultMidtoneClass,
+				...Object.values(themeMidtoneMap)
+			])).filter(Boolean);
 			const storageKey = 'theme';
 			const previewResetDelay = {{ previewResetDelay }};
 			let activeTheme = themeTarget.dataset.theme;
 			let previewButtons = [];
 			let previewResetTimeout;
+
+			function applyMidtoneClass(id) {
+				const elements = document.querySelectorAll('.theme-midtone');
+				if (!elements.length) return;
+				const midtoneClass = themeMidtoneMap[id] || defaultMidtoneClass;
+				elements.forEach(element => {
+					if (allMidtoneClasses.length) element.classList.remove(...allMidtoneClasses);
+					if (midtoneClass) element.classList.add(midtoneClass);
+				});
+			}
 
 			function updateActivePreview(id) {
 				if (!previewButtons.length) return;
@@ -90,6 +114,7 @@
 				themeTarget.classList.remove(...allThemeClasses);
 				themeTarget.classList.add(...themeMap[id]);
 				themeTarget.dataset.theme = id;
+				applyMidtoneClass(id);
 				if (!preview) {
 					activeTheme = id;
 					updateActivePreview(id);
@@ -132,6 +157,8 @@
 				}
 				applyTheme(initial, { persist: false, syncSelect: false });
 			}
+
+			applyMidtoneClass(activeTheme);
 
 			document.addEventListener('DOMContentLoaded', () => {
 				initTheme();
