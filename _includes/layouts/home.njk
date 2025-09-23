@@ -124,6 +124,18 @@ layout: layouts/base.njk
 
     <!-- Main content -->
     <main class="w-100 w-75-ns pa4 lh-copy">
+      {% if showPostHeader %}
+        <header class="mb4">
+          {% if page.date %}
+            <p class="f6 ttu tracked mid-gray mt0 mb2">
+              <time datetime="{{ page.date | machineDate }}">{{ page.date | readableDate }}</time>
+            </p>
+          {% endif %}
+          {% if title %}
+            <h1 class="f2 lh-title mt0 mb3">{{ title }}</h1>
+          {% endif %}
+        </header>
+      {% endif %}
       <heading-anchors>
         {{ content | safe }}
       </heading-anchors>

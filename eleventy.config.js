@@ -25,6 +25,26 @@ export default function (eleventyConfig) {
 	// Tell 11ty to use our custom Markdown-it
 	eleventyConfig.setLibrary("md", md);
 
+	eleventyConfig.addFilter("readableDate", (dateValue, locale = "en-US") => {
+		if (!dateValue) return "";
+		const date = dateValue instanceof Date ? dateValue : new Date(dateValue);
+		if (Number.isNaN(date.getTime())) return "";
+		const formatter = new Intl.DateTimeFormat(locale, {
+			year: "numeric",
+			month: "long",
+			day: "numeric",
+			timeZone: "UTC",
+		});
+		return formatter.format(date);
+	});
+
+	eleventyConfig.addFilter("machineDate", (dateValue) => {
+		if (!dateValue) return "";
+		const date = dateValue instanceof Date ? dateValue : new Date(dateValue);
+		if (Number.isNaN(date.getTime())) return "";
+		return date.toISOString().split("T")[0];
+	});
+
 	eleventyConfig.addFilter("excerpt", (content, paragraphCount = 2) => {
 		if (!content) return "";
 		const html = String(content);
