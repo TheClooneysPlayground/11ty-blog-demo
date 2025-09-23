@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="{{ metadata.language }}">
+<html lang="{{ metadata.language }}" class="theme {{ defaultThemeClasses }}" data-theme="{{ defaultTheme.id }}" data-default-theme="{{ defaultTheme.id }}">
 	{% set siteThemeConfig = site.theme or {} %}
 	{% set configuredDefaultThemeId = siteThemeConfig.defaultId %}
 	{% set defaultTheme = themes | first %}
@@ -22,25 +22,52 @@
 		<meta name="description" content="{{ description or metadata.description }}">
 		<link rel="alternate" href="/feed/feed.xml" type="application/atom+xml" title="{{ metadata.title }}">
 
+		<script>
+			(function() {
+				const themeTarget = document.documentElement;
+				const defaultThemeId = themeTarget.dataset.defaultTheme;
+				const themeConfig = {{ themes | dump | safe }};
+				const themeMap = themeConfig.reduce((map, theme) => {
+					map[theme.id] = theme.classes;
+					return map;
+				}, {});
+				const allThemeClasses = Array.from(new Set(themeConfig.flatMap(theme => theme.classes)));
+				let desiredThemeId = defaultThemeId;
+				try {
+					const stored = localStorage.getItem('theme');
+					if (stored && themeMap[stored]) {
+						desiredThemeId = stored;
+					}
+				} catch (error) {
+					/* Ignore storage access errors and fall back to default theme. */
+				}
+				const desiredClasses = themeMap[desiredThemeId];
+				if (!desiredClasses) return;
+				themeTarget.classList.remove(...allThemeClasses);
+				themeTarget.classList.add(...desiredClasses);
+				themeTarget.dataset.theme = desiredThemeId;
+			})();
+		</script>
+
 		{#- Uncomment this if you’d like folks to know that you used Eleventy to build your site!  #}
 		{#- <meta name="generator" content="{{ eleventy.generator }}"> #}
 
 			<link rel="stylesheet" href="https://unpkg.com/tachyons@4.12.0/css/tachyons.min.css"/>
 			<style>
-				body.theme {
+				html.theme {
 					transition: background-color {{ transitionDuration }} {{ transitionTimingFunction }}, color {{ transitionDuration }} {{ transitionTimingFunction }};
 				}
-				body.theme .theme-text,
-				body.theme a,
-				body.theme [data-theme-preview] span {
+				html.theme .theme-text,
+				html.theme a,
+				html.theme [data-theme-preview] span {
 					transition: color {{ transitionDuration }} {{ transitionTimingFunction }}, background-color {{ transitionDuration }} {{ transitionTimingFunction }};
 				}
-				body.theme .theme-midtone {
+				html.theme .theme-midtone {
 					transition: color {{ transitionDuration }} {{ transitionTimingFunction }};
 				}
 			</style>
 	</head>
-	<body class="theme {{ defaultThemeClasses }}" data-theme="{{ defaultTheme.id }}" data-default-theme="{{ defaultTheme.id }}">
+	<body>
 		<main>
 			{{ content | safe }}
 		</main>
@@ -48,7 +75,7 @@
 	<script>
 		(function() {
 			const themeConfig = {{ themes | dump | safe }};
-			const themeTarget = document.body;
+			const themeTarget = document.documentElement;
 			const themeMap = themeConfig.reduce((map, theme) => {
 				map[theme.id] = theme.classes;
 				return map;
