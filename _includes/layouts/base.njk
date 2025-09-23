@@ -70,16 +70,6 @@
 			let previewButtons = [];
 			let previewResetTimeout;
 
-			function applyMidtoneClass(id) {
-				const elements = document.querySelectorAll('.theme-midtone');
-				if (!elements.length) return;
-				const midtoneClass = themeMidtoneMap[id] || defaultMidtoneClass;
-				elements.forEach(element => {
-					if (allMidtoneClasses.length) element.classList.remove(...allMidtoneClasses);
-					if (midtoneClass) element.classList.add(midtoneClass);
-				});
-			}
-
 			function updateActivePreview(id) {
 				if (!previewButtons.length) return;
 				previewButtons.forEach(button => {
@@ -114,7 +104,13 @@
 				themeTarget.classList.remove(...allThemeClasses);
 				themeTarget.classList.add(...themeMap[id]);
 				themeTarget.dataset.theme = id;
-				applyMidtoneClass(id);
+				const midtoneClass = themeMidtoneMap[id] || defaultMidtoneClass;
+				if (allMidtoneClasses.length) {
+					document.querySelectorAll('.theme-midtone').forEach(element => {
+						element.classList.remove(...allMidtoneClasses);
+						if (midtoneClass) element.classList.add(midtoneClass);
+					});
+				}
 				if (!preview) {
 					activeTheme = id;
 					updateActivePreview(id);
@@ -158,7 +154,7 @@
 				applyTheme(initial, { persist: false, syncSelect: false });
 			}
 
-			applyMidtoneClass(activeTheme);
+			applyTheme(activeTheme, { persist: false, syncSelect: false, preview: true });
 
 			document.addEventListener('DOMContentLoaded', () => {
 				initTheme();
