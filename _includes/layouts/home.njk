@@ -4,7 +4,7 @@ layout: layouts/base.njk
 
 {% macro renderNav(items) %}
   <ul class="list pl0 ma0 pa0 flex flex-column lh-copy items-end">
-    {% for item in items %}
+    {% for item in reversed(items) %}
       <li class="mb2 w-100">
         <a href="{{ item.url }}"
            class="db pa3 link dim f5 lh-copy tr tl-ns theme-text">
