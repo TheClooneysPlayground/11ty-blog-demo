@@ -25,6 +25,9 @@ export default function (eleventyConfig) {
 	// Tell 11ty to use our custom Markdown-it
 	eleventyConfig.setLibrary("md", md);
 
+	// Copy static assets straight through to the build output
+	eleventyConfig.addPassthroughCopy("assets");
+
 	eleventyConfig.addFilter("readableDate", (dateValue, locale = "en-US") => {
 		if (!dateValue) return "";
 		const date = dateValue instanceof Date ? dateValue : new Date(dateValue);
