@@ -1,5 +1,13 @@
 export default {
   eleventyComputed: {
-    ogImage: (data) => data.ogImage ?? data.ogImages?.[data.page?.fileSlug ?? ""],
+    ogImage: (data) => {
+      const { ogImage, ogImages, page } = data;
+      if (ogImage) return ogImage;
+
+      const slug = page?.fileSlug;
+      if (!slug || !ogImages) return undefined;
+
+      return ogImages[slug];
+    },
   },
 };
