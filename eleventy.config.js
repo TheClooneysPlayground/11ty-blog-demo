@@ -4,18 +4,29 @@ import eleventyNavigationPlugin from "@11ty/eleventy-navigation";
 // Bake our own Markdown anchors
 import MarkdownIt from "markdown-it";
 import MarkdownItAnchor from "markdown-it-anchor";
+import MarkdownItTocDoneRight from "markdown-it-toc-done-right";
 // Use yaml for data
 import yaml from "js-yaml";
 import excerpt from "./lib/excerpt.js";
 
 const OG_FORCE_ENV = process.env.OG_FORCE === "true";
 
+const slugify = (value) =>
+	encodeURIComponent(String(value).trim().toLowerCase().replace(/\s+/g, "-"));
+
 const md = new MarkdownIt({ html: true, linkify: true })
 .use(MarkdownItAnchor, {
+	slugify,
 	permalink: MarkdownItAnchor.permalink.ariaHidden({
 		class: "header-anchor",
-    	placement: 'before'
+		placement: "before",
 	}),
+})
+.use(MarkdownItTocDoneRight, {
+	containerClass: "toc",
+	listType: "ul",
+	level: [2, 3],
+	slugify,
 });
 
 export default function (eleventyConfig) {

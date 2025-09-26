@@ -15,6 +15,9 @@ Here is an example card for this blog post.
 
 <img height="300" alt="image" src="/assets/social-cards.png" />
 
+## Table of Contents
+
+[[toc]]
 
 ## Figuring Out the Spec
 
