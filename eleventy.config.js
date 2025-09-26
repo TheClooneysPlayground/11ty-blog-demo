@@ -51,6 +51,16 @@ export default function (eleventyConfig) {
 
 	eleventyConfig.addFilter("excerpt", excerpt);
 
+	eleventyConfig.addFilter("absoluteUrl", (path, base = "") => {
+		if (!path) return "";
+		try {
+			const result = new URL(path, base || "http://localhost");
+			return result.toString();
+		} catch (error) {
+			return path;
+		}
+	});
+
 	eleventyConfig.on("eleventy.before", async () => {
 		const { generateOgImages } = await import("./scripts/generate-og-images.js");
 		await generateOgImages({ force: OG_FORCE_ENV });
