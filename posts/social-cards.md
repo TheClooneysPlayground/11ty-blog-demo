@@ -11,6 +11,11 @@ had to be an open standard behind it, but I’d never hooked it up myself. Cue a
 session with GPT-5 Codex, and about two hours later, the 11ty Subspace Builder can mint
 its own branded previews for every post.
 
+Here is an example card for this blog post.
+
+<img height="300" alt="image" src="/assets/social-cards.png" />
+
+
 ## Figuring Out the Spec
 
 The “standards” are mostly Open Graph (Facebook/Meta) and Twitter card meta tags.
