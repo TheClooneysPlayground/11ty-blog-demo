@@ -9,7 +9,7 @@ import slugify from 'slugify';
 // Use yaml for data
 import yaml from "js-yaml";
 
-const md = new MarkdownIt({ html: true })
+const md = new MarkdownIt({ html: true, linkify: true })
 .use(MarkdownItAnchor, {
 	permalink: MarkdownItAnchor.permalink.ariaHidden({
 		class: "header-anchor",
