@@ -1,0 +1,143 @@
+<script>
+	(function() {
+		const themeConfig = {{ themes | dump | safe }};
+		const themeTarget = document.documentElement;
+		const themeMap = themeConfig.reduce((map, theme) => {
+			map[theme.id] = theme.classes;
+			return map;
+		}, {});
+		const defaultMidtoneClass = {{ defaultThemeMidtoneClass | dump | safe }};
+		const themeMidtoneMap = themeConfig.reduce((map, theme) => {
+			const className = theme.midtoneClass || defaultMidtoneClass;
+			map[theme.id] = className;
+			return map;
+		}, {});
+		const allThemeClasses = Array.from(new Set(themeConfig.flatMap(theme => theme.classes)));
+		const allMidtoneClasses = Array.from(new Set([
+			defaultMidtoneClass,
+			...Object.values(themeMidtoneMap)
+		])).filter(Boolean);
+		const storageKey = 'theme';
+		const previewResetDelay = {{ previewResetDelay }};
+		let activeTheme = themeTarget.dataset.theme;
+		let previewButtons = [];
+		let previewResetTimeout;
+
+		function updateActivePreview(id) {
+			if (!previewButtons.length) return;
+			previewButtons.forEach(button => {
+				const isActive = button.dataset.themePreview === id;
+				if (isActive) {
+					button.setAttribute('data-active', '');
+				} else {
+					button.removeAttribute('data-active');
+				}
+				button.classList.toggle('b--black-80', isActive);
+				button.classList.toggle('o-60', !isActive);
+				button.setAttribute('aria-pressed', String(isActive));
+			});
+		}
+
+		function clearPreviewReset() {
+			if (!previewResetTimeout) return;
+			clearTimeout(previewResetTimeout);
+			previewResetTimeout = undefined;
+		}
+
+		function schedulePreviewReset() {
+			clearPreviewReset();
+			previewResetTimeout = setTimeout(() => {
+				applyTheme(activeTheme, { persist: false, syncSelect: true, preview: true });
+			}, previewResetDelay);
+		}
+
+		function applyTheme(id, options = {}) {
+			if (!themeMap[id]) return;
+			const { persist = true, syncSelect = true, preview = false } = options;
+			themeTarget.classList.remove(...allThemeClasses);
+			themeTarget.classList.add(...themeMap[id]);
+			themeTarget.dataset.theme = id;
+			const midtoneClass = themeMidtoneMap[id] || defaultMidtoneClass;
+			if (allMidtoneClasses.length) {
+				document.querySelectorAll('.theme-midtone').forEach(element => {
+					element.classList.remove(...allMidtoneClasses);
+					if (midtoneClass) element.classList.add(midtoneClass);
+				});
+			}
+			if (!preview) {
+				activeTheme = id;
+				updateActivePreview(id);
+				if (persist) {
+					try {
+						localStorage.setItem(storageKey, id);
+					} catch (error) {
+						/* localStorage may be unavailable; ignore persistence */
+					}
+				}
+			}
+			if (syncSelect) {
+				document.querySelectorAll('[data-theme-select]').forEach(select => {
+					if (select.value !== id) select.value = id;
+				});
+			}
+		}
+
+		function previewTheme(id) {
+			clearPreviewReset();
+			applyTheme(id, { persist: false, syncSelect: false, preview: true });
+		}
+
+		function cancelPreview(event) {
+			if (event && event.relatedTarget && event.relatedTarget.closest && event.relatedTarget.closest('[data-theme-preview]')) {
+				return;
+			}
+			schedulePreviewReset();
+		}
+
+		function initTheme() {
+			let initial = themeTarget.dataset.defaultTheme;
+			try {
+				const stored = localStorage.getItem(storageKey);
+				if (stored && themeMap[stored]) {
+					initial = stored;
+				}
+			} catch (error) {
+				/* ignore storage issues and fall back to default */
+			}
+			applyTheme(initial, { persist: false, syncSelect: false });
+		}
+
+		applyTheme(activeTheme, { persist: false, syncSelect: false, preview: true });
+
+		document.addEventListener('DOMContentLoaded', () => {
+			initTheme();
+			const themeSelects = document.querySelectorAll('[data-theme-select]');
+			themeSelects.forEach(select => {
+				if (!themeMap[select.value]) {
+					select.value = themeTarget.dataset.theme;
+				}
+				select.addEventListener('change', event => {
+					applyTheme(event.target.value);
+				});
+			});
+
+			const supportsPointer = 'PointerEvent' in window;
+			previewButtons = Array.from(document.querySelectorAll('[data-theme-preview]'));
+			previewButtons.forEach(button => {
+				const themeId = button.dataset.themePreview;
+				const enterEvent = supportsPointer ? 'pointerenter' : 'mouseenter';
+				const leaveEvent = supportsPointer ? 'pointerleave' : 'mouseleave';
+				button.addEventListener(enterEvent, () => previewTheme(themeId));
+				button.addEventListener(leaveEvent, cancelPreview);
+				button.addEventListener('focus', () => previewTheme(themeId));
+				button.addEventListener('blur', cancelPreview);
+				button.addEventListener('click', () => {
+					clearPreviewReset();
+					applyTheme(themeId);
+				});
+			});
+
+			updateActivePreview(themeTarget.dataset.theme);
+		});
+	})();
+</script>

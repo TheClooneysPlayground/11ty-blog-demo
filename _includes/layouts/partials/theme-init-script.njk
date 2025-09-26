@@ -1,0 +1,26 @@
+<script>
+	(function() {
+		const themeTarget = document.documentElement;
+		const defaultThemeId = themeTarget.dataset.defaultTheme;
+		const themeConfig = {{ themes | dump | safe }};
+		const themeMap = themeConfig.reduce((map, theme) => {
+			map[theme.id] = theme.classes;
+			return map;
+		}, {});
+		const allThemeClasses = Array.from(new Set(themeConfig.flatMap(theme => theme.classes)));
+		let desiredThemeId = defaultThemeId;
+		try {
+			const stored = localStorage.getItem('theme');
+			if (stored && themeMap[stored]) {
+				desiredThemeId = stored;
+			}
+		} catch (error) {
+			/* Ignore storage access errors and fall back to default theme. */
+		}
+		const desiredClasses = themeMap[desiredThemeId];
+		if (!desiredClasses) return;
+		themeTarget.classList.remove(...allThemeClasses);
+		themeTarget.classList.add(...desiredClasses);
+		themeTarget.dataset.theme = desiredThemeId;
+	})();
+</script>
