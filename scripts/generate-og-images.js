@@ -14,7 +14,7 @@ import excerpt from "../lib/excerpt.js";
 import MarkdownIt from "markdown-it";
 import MarkdownItAnchor from "markdown-it-anchor";
 
-const TEMPLATE_VERSION = "v2";
+const TEMPLATE_VERSION = "v3";
 const WIDTH = 1200;
 const HEIGHT = 630;
 const require = createRequire(import.meta.url);
@@ -117,7 +117,46 @@ function truncate(text, maxLength) {
   return `${shortened.slice(0, lastSpace > 80 ? lastSpace : maxLength)}…`;
 }
 
+const TITLE_STYLES = [
+  { maxChars: 42, fontSize: 72, letterSpacing: -1.2, lineHeight: 1.05 },
+  { maxChars: 60, fontSize: 64, letterSpacing: -1.1, lineHeight: 1.07 },
+  { maxChars: 78, fontSize: 58, letterSpacing: -1.0, lineHeight: 1.1 },
+  { maxChars: 96, fontSize: 52, letterSpacing: -0.9, lineHeight: 1.12 },
+  { maxChars: Infinity, fontSize: 46, letterSpacing: -0.8, lineHeight: 1.15, truncateChars: 112 },
+];
+
+const EXCERPT_STYLES = [
+  { maxChars: 160, fontSize: 32, lineHeight: 1.42 },
+  { maxChars: 220, fontSize: 28, lineHeight: 1.46 },
+  { maxChars: Infinity, fontSize: 26, lineHeight: 1.5, truncateChars: 260 },
+];
+
+function fitTitle(text) {
+  const cleaned = text.trim();
+  for (const style of TITLE_STYLES) {
+    if (cleaned.length <= style.maxChars) {
+      const finalText = style.truncateChars ? truncate(cleaned, style.truncateChars) : cleaned;
+      return { ...style, text: finalText };
+    }
+  }
+  return { ...TITLE_STYLES[TITLE_STYLES.length - 1], text: truncate(cleaned, 112) };
+}
+
+function fitExcerpt(text) {
+  const normalized = text.replace(/\s+/g, " ").trim();
+  for (const style of EXCERPT_STYLES) {
+    if (normalized.length <= style.maxChars) {
+      const finalText = style.truncateChars ? truncate(normalized, style.truncateChars) : normalized;
+      return { ...style, text: finalText };
+    }
+  }
+  return { ...EXCERPT_STYLES[EXCERPT_STYLES.length - 1], text: truncate(normalized, 260) };
+}
+
 function buildTemplate({ title, excerpt: excerptText }) {
+  const fittedTitle = fitTitle(title);
+  const fittedExcerpt = fitExcerpt(excerptText);
+
   return html`
     <div
       style="
@@ -134,21 +173,21 @@ function buildTemplate({ title, excerpt: excerptText }) {
     >
       <div style="display:flex; flex-direction:column; gap:24px; max-width: 920px;">
         <div
-          style="font-size: 72px; font-weight: 700; line-height: 1.05; letter-spacing: -1.2px;"
+          style="font-size: ${fittedTitle.fontSize}px; font-weight: 700; line-height: ${fittedTitle.lineHeight}; letter-spacing: ${fittedTitle.letterSpacing}px;"
         >
-          ${escapeHtml(title)}
+          ${escapeHtml(fittedTitle.text)}
         </div>
         <div
           style="
-            font-size: 32px;
+            font-size: ${fittedExcerpt.fontSize}px;
             font-family: 'Inter';
             font-weight: 400;
-            line-height: 1.4;
+            line-height: ${fittedExcerpt.lineHeight};
             color: rgba(17, 17, 17, 0.78);
             max-width: 820px;
           "
         >
-          ${escapeHtml(excerptText)}
+          ${escapeHtml(fittedExcerpt.text)}
         </div>
       </div>
       <div style="display:flex; justify-content: space-between; align-items: center;">
@@ -224,11 +263,12 @@ async function collectPosts() {
     const htmlContent = markdown.render(content ?? "");
     const excerptSource = data.excerpt ? String(data.excerpt) : excerpt(htmlContent, 2);
     const plainExcerpt = stripHtml(excerptSource);
+    const normalizedExcerpt = truncate(plainExcerpt, 320);
 
     posts.push({
       slug,
       title: data.title ?? slug,
-      excerpt: truncate(plainExcerpt, 220),
+      excerpt: normalizedExcerpt,
     });
   }
 
