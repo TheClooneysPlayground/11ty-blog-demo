@@ -82,5 +82,12 @@ Posts automatically pick up the layout defined in `posts/posts.json`. The `excer
 - Set `ELEVENTY_ENV=production` when building for production to leverage Eleventy’s environment-based defaults.
 - Because Tachyons is loaded from a CDN, ensure outbound requests are allowed by your host or replace the `<link>` in `base.njk` with a bundled stylesheet.
 
+## FAQ
+### Why does the homepage say "No posts published yet" even though posts exist?
+The home page runs `renderPostList(collections.posts, ...)` and Eleventy only adds templates to `collections.posts` when they are tagged `posts`. Make sure your post defaults include `"tags": ["posts"]`—for example, set it once in `posts/posts.json` so every Markdown file under `posts/` inherits the tag.
+
+### Why are posts ordered oldest-first?
+Eleventy builds `collections.posts` in ascending date order by default (oldest first). The homepage reverses that list inside `renderPostList`, but any other consumer—like the navigation tree fed by `collections.all | eleventyNavigation`—will keep the oldest-first ordering unless you reverse it or define a custom collection that sorts newest-to-oldest.
+
 ## License
 MIT License - see [`LICENSE`](LICENSE).
