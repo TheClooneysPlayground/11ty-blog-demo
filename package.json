@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "og": "node ./scripts/generate-og-images.js"
   },
   "keywords": [],
   "author": "",
@@ -17,5 +18,13 @@
     "markdown-it": "^14.1.0",
     "markdown-it-anchor": "^9.2.0",
     "slugify": "^1.6.6"
+  },
+  "devDependencies": {
+    "@fontsource/inter": "^5.0.18",
+    "@fontsource/lexend": "^5.0.18",
+    "@resvg/resvg-js": "^2.6.0",
+    "gray-matter": "^4.0.3",
+    "satori": "^0.10.14",
+    "satori-html": "^0.3.2"
   }
 }

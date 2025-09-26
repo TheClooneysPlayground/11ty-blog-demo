@@ -1,0 +1,306 @@
+import { readFile, writeFile, mkdir, readdir, stat } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { fileURLToPath } from "node:url";
+import { createRequire } from "node:module";
+import path from "node:path";
+import process from "node:process";
+
+import { html } from "satori-html";
+import satori from "satori";
+import { Resvg } from "@resvg/resvg-js";
+import matter from "gray-matter";
+
+import excerpt from "../lib/excerpt.js";
+import MarkdownIt from "markdown-it";
+import MarkdownItAnchor from "markdown-it-anchor";
+
+const TEMPLATE_VERSION = "v2";
+const WIDTH = 1200;
+const HEIGHT = 630;
+const require = createRequire(import.meta.url);
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const ROOT_DIR = path.resolve(__dirname, "..");
+const POSTS_DIR = path.join(ROOT_DIR, "posts");
+const OUTPUT_DIR = path.join(ROOT_DIR, "assets", "og");
+const CACHE_DIR = path.join(ROOT_DIR, ".cache", "og");
+const MANIFEST_PATH = path.join(CACHE_DIR, "manifest.json");
+const DATA_PATH = path.join(ROOT_DIR, "_data", "ogImages.json");
+
+const CLI_FORCE = process.argv.includes("--force") || process.env.OG_FORCE === "true";
+
+const markdown = new MarkdownIt({ html: true, linkify: true }).use(
+  MarkdownItAnchor,
+  {
+    permalink: MarkdownItAnchor.permalink.ariaHidden({
+      class: "header-anchor",
+      placement: "before",
+    }),
+  }
+);
+
+async function loadFont(packageName, fileName, weight) {
+  const fontPath = require.resolve(`${packageName}/files/${fileName}`);
+  const data = await readFile(fontPath);
+  return { name: fontFamily(packageName), data, weight, style: "normal" };
+}
+
+function fontFamily(packageName) {
+  if (packageName.includes("lexend")) return "Lexend";
+  if (packageName.includes("inter")) return "Inter";
+  return "Sans";
+}
+
+async function loadFonts() {
+  return Promise.all([
+    loadFont("@fontsource/lexend", "lexend-latin-700-normal.woff", 700),
+    loadFont("@fontsource/inter", "inter-latin-500-normal.woff", 500),
+    loadFont("@fontsource/inter", "inter-latin-400-normal.woff", 400),
+  ]);
+}
+
+async function ensureDir(directory) {
+  await mkdir(directory, { recursive: true });
+}
+
+async function fileExists(filePath) {
+  try {
+    await stat(filePath);
+    return true;
+  } catch (error) {
+    if (error && error.code === "ENOENT") return false;
+    throw error;
+  }
+}
+
+async function readManifest() {
+  if (!(await fileExists(MANIFEST_PATH))) {
+    return { version: TEMPLATE_VERSION, entries: {} };
+  }
+  const raw = await readFile(MANIFEST_PATH, "utf8");
+  try {
+    return JSON.parse(raw);
+  } catch (error) {
+    console.warn("[og] Unable to parse manifest, starting fresh.");
+    return { version: TEMPLATE_VERSION, entries: {} };
+  }
+}
+
+async function writeManifest(manifest) {
+  const payload = JSON.stringify(manifest, null, 2);
+  await writeFile(MANIFEST_PATH, `${payload}\n`, "utf8");
+}
+
+async function writeDataFile(map) {
+  const payload = JSON.stringify(map, null, 2);
+  await writeFile(DATA_PATH, `${payload}\n`, "utf8");
+}
+
+function stripHtml(text) {
+  return text.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function escapeHtml(text) {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function truncate(text, maxLength) {
+  if (text.length <= maxLength) return text;
+  const shortened = text.slice(0, maxLength);
+  const lastSpace = shortened.lastIndexOf(" ");
+  return `${shortened.slice(0, lastSpace > 80 ? lastSpace : maxLength)}…`;
+}
+
+function buildTemplate({ title, excerpt: excerptText }) {
+  return html`
+    <div
+      style="
+        width: ${WIDTH}px;
+        height: ${HEIGHT}px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 72px 80px;
+        background: linear-gradient(135deg, #fff9c4, #ffd166);
+        color: #111111;
+        font-family: 'Lexend';
+      "
+    >
+      <div style="display:flex; flex-direction:column; gap:24px; max-width: 920px;">
+        <div
+          style="font-size: 72px; font-weight: 700; line-height: 1.05; letter-spacing: -1.2px;"
+        >
+          ${escapeHtml(title)}
+        </div>
+        <div
+          style="
+            font-size: 32px;
+            font-family: 'Inter';
+            font-weight: 400;
+            line-height: 1.4;
+            color: rgba(17, 17, 17, 0.78);
+            max-width: 820px;
+          "
+        >
+          ${escapeHtml(excerptText)}
+        </div>
+      </div>
+      <div style="display:flex; justify-content: space-between; align-items: center;">
+        <div style="height: 6px; width: 160px; background: #ffb700; border-radius: 999px;"></div>
+        <div
+          style="
+            font-family: 'Inter';
+            font-weight: 500;
+            font-size: 28px;
+            color: #d97706;
+            letter-spacing: 7px;
+            text-transform: uppercase;
+          "
+        >
+          Subspace
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// Remove whitespace-only text nodes so Satori doesn't count them as extra children.
+function sanitizeNode(node) {
+  if (node == null) return node;
+  if (typeof node === "string") {
+    const trimmed = node.trim();
+    return trimmed.length ? trimmed : null;
+  }
+  if (Array.isArray(node)) {
+    const cleaned = node
+      .map((child) => sanitizeNode(child))
+      .filter((child) => child !== null && child !== undefined);
+    return cleaned;
+  }
+  if (typeof node === "object") {
+    const props = node.props ?? {};
+    if (props.children !== undefined) {
+      const normalized = Array.isArray(props.children)
+        ? props.children
+        : [props.children];
+      const cleanedChildren = normalized
+        .map((child) => sanitizeNode(child))
+        .filter((child) => child !== null && child !== undefined);
+      if (cleanedChildren.length === 0) {
+        delete props.children;
+      } else if (cleanedChildren.length === 1) {
+        props.children = cleanedChildren[0];
+      } else {
+        props.children = cleanedChildren;
+      }
+      node.props = props;
+    }
+  }
+  return node;
+}
+
+function createHashForPost(data) {
+  const hash = createHash("sha256");
+  hash.update(JSON.stringify(data));
+  return hash.digest("hex").slice(0, 12);
+}
+
+async function collectPosts() {
+  const files = await readdir(POSTS_DIR, { withFileTypes: true });
+  const markdownFiles = files.filter((entry) => entry.isFile() && entry.name.endsWith(".md"));
+  const posts = [];
+
+  for (const file of markdownFiles) {
+    const filePath = path.join(POSTS_DIR, file.name);
+    const slug = path.basename(file.name, path.extname(file.name));
+    const raw = await readFile(filePath, "utf8");
+    const { data, content } = matter(raw);
+    const htmlContent = markdown.render(content ?? "");
+    const excerptSource = data.excerpt ? String(data.excerpt) : excerpt(htmlContent, 2);
+    const plainExcerpt = stripHtml(excerptSource);
+
+    posts.push({
+      slug,
+      title: data.title ?? slug,
+      excerpt: truncate(plainExcerpt, 220),
+    });
+  }
+
+  return posts;
+}
+
+export async function generateOgImages(options = {}) {
+  const force = options.force ?? CLI_FORCE;
+  await ensureDir(OUTPUT_DIR);
+  await ensureDir(CACHE_DIR);
+
+  const [fonts, manifest, posts] = await Promise.all([
+    loadFonts(),
+    readManifest(),
+    collectPosts(),
+  ]);
+
+  const ogMap = {};
+  const nextManifest = { version: TEMPLATE_VERSION, entries: {} };
+
+  for (const post of posts) {
+    const outputFilename = `${post.slug}.png`;
+    const outputPath = path.join(OUTPUT_DIR, outputFilename);
+
+    const templateData = {
+      ...post,
+      templateVersion: TEMPLATE_VERSION,
+    };
+    const hash = createHashForPost(templateData);
+    const previousEntry = manifest.entries?.[post.slug];
+    const hasMatch = !force && previousEntry?.hash === hash && (await fileExists(outputPath));
+
+    if (hasMatch) {
+      console.log(`[og] ✓ ${post.slug} unchanged (hash ${hash})`);
+      ogMap[post.slug] = `/assets/og/${outputFilename}`;
+      nextManifest.entries[post.slug] = previousEntry;
+      continue;
+    }
+
+    const templateTree = sanitizeNode(buildTemplate(post));
+    const svg = await satori(templateTree, {
+      width: WIDTH,
+      height: HEIGHT,
+      fonts,
+    });
+
+    const resvg = new Resvg(svg, {
+      fitTo: {
+        mode: "width",
+        value: WIDTH,
+      },
+    });
+
+    const png = resvg.render().asPng();
+    await writeFile(outputPath, png);
+
+    console.log(`[og] ★ generated ${post.slug} (hash ${hash})`);
+    ogMap[post.slug] = `/assets/og/${outputFilename}`;
+    nextManifest.entries[post.slug] = { hash };
+  }
+
+  await Promise.all([writeManifest(nextManifest), writeDataFile(ogMap)]);
+
+  console.log(`\n[og] Done. ${Object.keys(ogMap).length} entries written.`);
+}
+
+const invokedPath = process.argv[1] ? path.resolve(process.argv[1]) : null;
+const thisFilePath = fileURLToPath(import.meta.url);
+
+if (invokedPath === thisFilePath) {
+  generateOgImages().catch((error) => {
+    console.error("[og] Generation failed\n", error);
+    process.exitCode = 1;
+  });
+}

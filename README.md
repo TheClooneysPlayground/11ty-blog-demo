@@ -30,6 +30,13 @@ npx @11ty/eleventy
 ```
 The static output is written to the `_site/` directory. Deploy those files to any static host or CDN.
 
+## Social Preview Images
+- `scripts/generate-og-images.js` runs before each Eleventy build to produce 1200×630 Open Graph cards using Satori (HTML template) and Resvg. We stick with Satori’s HTML helper instead of JSX so the pipeline stays zero-transpile and works out-of-the-box in Node.
+- Templates blend Lexend (heading) + Inter (body) from the `@fontsource/*` packages and use the Sun theme palette (soft yellow gradient, amber accents, black typography); tweak `buildTemplate` to adjust the look.
+- Content hashing keeps regeneration cheap—changes to a post’s title, excerpt, or the template version trigger a refresh, otherwise cached PNGs in `.cache/og/` are reused.
+- Use `npm run og` to generate cards manually, `npm run og -- --force` (or `OG_FORCE=true npx @11ty/eleventy`) to rebuild everything, and check the emitted file map in `_data/ogImages.json`.
+- Posts automatically receive an `ogImage` field via computed data, so layouts and feeds can reference `{{ ogImage }}` without manual front matter tweaks.
+
 ## Project Structure
 - `_data/` - Global data files (`site.yaml` and `themes.yaml`) that drive metadata, theme options, and animation settings.
 - `_includes/layouts/` - Base and page layouts, including the responsive navigation + theme selector UI in `home.njk`.

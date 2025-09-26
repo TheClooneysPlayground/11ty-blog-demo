@@ -4,11 +4,11 @@ import eleventyNavigationPlugin from "@11ty/eleventy-navigation";
 // Bake our own Markdown anchors
 import MarkdownIt from "markdown-it";
 import MarkdownItAnchor from "markdown-it-anchor";
-import slugify from 'slugify';
-
 // Use yaml for data
 import yaml from "js-yaml";
 import excerpt from "./lib/excerpt.js";
+
+const OG_FORCE_ENV = process.env.OG_FORCE === "true";
 
 const md = new MarkdownIt({ html: true, linkify: true })
 .use(MarkdownItAnchor, {
@@ -50,4 +50,9 @@ export default function (eleventyConfig) {
 	});
 
 	eleventyConfig.addFilter("excerpt", excerpt);
+
+	eleventyConfig.on("eleventy.before", async () => {
+		const { generateOgImages } = await import("./scripts/generate-og-images.js");
+		await generateOgImages({ force: OG_FORCE_ENV });
+	});
 };
