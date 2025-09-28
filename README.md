@@ -25,6 +25,12 @@ npm run dev
 ```
 This sets `ELEVENTY_ENV=development` and starts Eleventy in watch/serve mode. Visit `http://localhost:8080` (default) to browse the site. Theme selections persist in `localStorage` so you can preview skins as you work.
 
+### Local production preview
+```bash
+npm run prod
+```
+Runs the site with `ELEVENTY_ENV=production` while keeping Eleventy’s dev server running so you can QA the published experience without deploying.
+
 ### Production build
 ```bash
 npm run build
