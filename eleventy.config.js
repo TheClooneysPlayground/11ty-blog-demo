@@ -34,6 +34,12 @@ const md = new MarkdownIt({ html: true, linkify: true })
 export default function (eleventyConfig) {
 	eleventyConfig.addDataExtension("yaml", (contents) => yaml.load(contents));
 
+	eleventyConfig.addGlobalData("eleventyComputed", {
+		eleventyExcludeFromCollections(data) {
+			return data.draft && process.env.ELEVENTY_ENV === "production";
+		},
+	});
+
 	eleventyConfig.addPlugin(eleventyNavigationPlugin);
 	eleventyConfig.addPlugin(eleventyImageTransformPlugin, {
 		formats: ["avif", "webp", "jpeg"],

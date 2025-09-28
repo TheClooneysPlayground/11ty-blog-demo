@@ -21,15 +21,15 @@ npm install
 
 ### Local development
 ```bash
-npx @11ty/eleventy --serve
+npm run dev
 ```
-Visit `http://localhost:8080` (default) to browse the site. Theme selections persist in `localStorage` so you can preview skins as you work.
+This sets `ELEVENTY_ENV=development` and starts Eleventy in watch/serve mode. Visit `http://localhost:8080` (default) to browse the site. Theme selections persist in `localStorage` so you can preview skins as you work.
 
 ### Production build
 ```bash
-npx @11ty/eleventy
+npm run build
 ```
-The static output is written to the `_site/` directory. Deploy those files to any static host or CDN.
+This sets `ELEVENTY_ENV=production` and writes the static output to the `_site/` directory. Deploy those files to any static host or CDN.
 
 ## Social Preview Images
 - `scripts/generate-og-images.js` runs before each Eleventy build to produce 1200×630 Open Graph cards using Satori (HTML template) and Resvg. We stick with Satori’s HTML helper instead of JSX so the pipeline stays zero-transpile and works out-of-the-box in Node.
