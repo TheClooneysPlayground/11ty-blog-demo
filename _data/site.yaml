@@ -10,3 +10,12 @@ theme:
    # all options: linear, ease, ease-in, ease-out, ease-in-out
   transitionTimingFunction: ease-in-out
   defaultId: sun
+
+# giscus comments system
+# get your config here: https://giscus.app/
+giscus:
+  repo: TheClooneyCollection/11ty-subspace-builder
+  repoId: R_kgDOOtI2Pw
+  category: Announcements
+  categoryId: DIC_kwDOOtI2P84CwAOl
+  mapping: og:title

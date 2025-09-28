@@ -20,6 +20,7 @@ layout: layouts/base.njk
 
 {% set siteThemeConfig = site.theme or {} %}
 {% set showThemeSelectors = siteThemeConfig.showSelectors if siteThemeConfig.showSelectors is defined else true %}
+{% set giscusConfig = site.giscus or {} %}
 
 <div class="sans-serif">
   <style>
@@ -139,6 +140,23 @@ layout: layouts/base.njk
       <heading-anchors>
         {{ content | safe }}
       </heading-anchors>
+      {% if page.url and page.url.indexOf('/posts/') == 0 and giscusConfig.repo %}
+        <script src="https://giscus.app/client.js"
+                data-repo="{{ giscusConfig.repo }}"
+                data-repo-id="{{ giscusConfig.repoId }}"
+                data-category="{{ giscusConfig.category }}"
+                data-category-id="{{ giscusConfig.categoryId }}"
+                data-mapping="{{ giscusConfig.mapping | default('pathname') }}"
+                data-strict="0"
+                data-reactions-enabled="1"
+                data-emit-metadata="0"
+                data-input-position="top"
+                data-theme="preferred_color_scheme"
+                data-lang="en"
+                crossorigin="anonymous"
+                async>
+        </script>
+      {% endif %}
     </main>
   </div>
 </div>
