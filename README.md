@@ -58,6 +58,12 @@ This sets `ELEVENTY_ENV=production` and writes the static output to the `_site/`
 - `title`, `url`, and author contact details.
 - `theme` block toggles the selector (`showSelectors`), controls animation timings, and sets the default theme (`defaultId`).
 
+### Comments (`giscus`)
+- Giscus is optional and configured via the `giscus` block in `_data/site.yaml`.
+- Visit [giscus.app](https://giscus.app/) with your GitHub repository selected to generate the `repo`, `repoId`, `category`, and `categoryId` values—replace the defaults before enabling comments on your site.
+- If you do not plan to use Giscus, delete or comment out the `giscus` block so any clones of this starter do not point comment traffic at someone else’s repository.
+- The remaining attributes (`mapping`, `lang`, etc.) can stay at their defaults unless you want to tweak how threads are created or which language the widget uses.
+
 ### Theme presets (`_data/themes.yaml`)
 Add, remove, or tweak Tachyons class pairs here. Each theme entry accepts:
 - `id` - Unique identifier used for persistence and data attributes.
