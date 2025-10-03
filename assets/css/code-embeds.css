@@ -128,5 +128,7 @@
 .gh-embed__ol > li > code {
   display: block;
   white-space: pre;
+  -moz-tab-size: 4;
+  tab-size: 4;
   color: inherit;
 }
