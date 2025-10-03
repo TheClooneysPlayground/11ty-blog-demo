@@ -41,6 +41,36 @@ const escapeHtml = (value) =>
 		.replace(/>/g, "&gt;")
 		.replace(/"/g, "&quot;");
 
+const trimSharedIndent = (value) => {
+	if (typeof value !== "string" || value.length === 0) return value;
+	const lines = value.split("\n");
+	let minIndent = null;
+
+	for (const line of lines) {
+		if (!line.trim()) continue;
+		const match = line.match(/^[\t ]*/);
+		const indentLength = match ? match[0].length : 0;
+		if (indentLength === 0) {
+			minIndent = 0;
+			break;
+		}
+		minIndent = minIndent === null ? indentLength : Math.min(minIndent, indentLength);
+	}
+
+	if (!minIndent) return value;
+
+	return lines
+		.map((line) => {
+			if (!line.trim()) return "";
+			const match = line.match(/^[\t ]*/);
+			const indentLength = match ? match[0].length : 0;
+			if (indentLength === 0) return line;
+			const remove = Math.min(indentLength, minIndent);
+			return line.slice(remove);
+		})
+		.join("\n");
+};
+
 const guessLanguageByExt = (filePath) => {
 	const ext = path.extname(filePath).toLowerCase().replace(".", "");
 	const map = {
@@ -162,6 +192,7 @@ export default function (eleventyConfig) {
 				const lines = source.split("\n");
 				code = lines.slice(meta.start - 1, meta.end).join("\n");
 			}
+			code = trimSharedIndent(code);
 
 			const language = guessLanguageByExt(meta.filePath);
 			const normalizedLanguage = typeof language === "string" ? language.toLowerCase().replace(/[^a-z0-9-]+/g, "") : "";
