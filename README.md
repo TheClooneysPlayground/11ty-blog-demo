@@ -9,7 +9,8 @@ A warp-speed Eleventy blog starter powered by Tachyons utility classes. It ships
 - Recursive Eleventy Navigation sidebar with responsive hamburger toggle
 - Reusable post list macro that trims excerpts and formats dates
 - Responsive image pipeline powered by `@11ty/eleventy-img` (see [Responsive Images with Eleventy Img](posts/responsive-images-eleventy-img.md))
-- YAML-driven site metadata, theme presets, and animation timing controls
+- YAML-driven site metadata, theme presets, animation timing controls, and optional Umami analytics configuration managed in `_data/site.yml`
+- GitHub snippet embedding via a `{% raw %}{% github %}{% endraw %}` shortcode that fetches, highlights, and caches remote code
 
 ## Quick Start
 
@@ -58,7 +59,7 @@ This sets `ELEVENTY_ENV=production` and writes the static output to the `_site/`
 
 ## Project Structure
 
-- `_data/` - Global data files (`site.yaml` and `themes.yaml`) that drive metadata, theme options, and animation settings.
+- `_data/` - Global data files (`site.yml` and `themes.yaml`) that drive metadata, theme options, and animation settings.
 - `_includes/layouts/` - Base and page layouts, including the responsive navigation + theme selector UI in `home.njk`.
 - `_includes/components/` - Shareable Nunjucks macros like `post-list.njk` for rendering excerpts.
 - `posts/` - Blog posts and collection defaults (`posts.json` assigns the home layout to the collection).
@@ -67,14 +68,15 @@ This sets `ELEVENTY_ENV=production` and writes the static output to the `_site/`
 
 ## Configuration
 
-### Site settings (`_data/site.yaml`)
+### Site settings (`_data/site.yml`)
 
 - `title`, `url`, and author contact details.
 - `theme` block toggles the selector (`showSelectors`), controls animation timings, and sets the default theme (`defaultId`).
+- `umami-tracking` block (optional) controls the analytics script URL and `website-id`; remove or comment it out to disable tracking.
 
 ### Comments (`giscus`)
 
-- Giscus is optional and configured via the `giscus` block in `_data/site.yaml`.
+- Giscus is optional and configured via the `giscus` block in `_data/site.yml`.
 - Visit [giscus.app](https://giscus.app/) with your GitHub repository selected to generate the `repo`, `repoId`, `category`, and `categoryId` values—replace the defaults before enabling comments on your site.
 - If you do not plan to use Giscus, delete or comment out the `giscus` block so any clones of this starter do not point comment traffic at someone else’s repository.
 - The remaining attributes (`mapping`, `lang`, etc.) can stay at their defaults unless you want to tweak how threads are created or which language the widget uses.
