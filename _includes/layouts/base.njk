@@ -45,6 +45,11 @@
 <head>
 	{% include "layouts/partials/head-seo.njk" %}
 	{% include "layouts/partials/theme-styles.njk" %}
+
+	{% if environment != 'development' %}
+		{% include "layouts/partials/analytics-tracking-script.njk" %}
+	{% endif %}
+
 </head>
 <body>
 	<main>
