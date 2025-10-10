@@ -10,7 +10,8 @@ A warp-speed Eleventy blog starter powered by Tachyons utility classes. It ships
 - Reusable post list macro that trims excerpts and formats dates
 - Responsive image pipeline powered by `@11ty/eleventy-img` (see [Responsive Images with Eleventy Img](posts/responsive-images-eleventy-img.md))
 - YAML-driven site metadata, theme presets, animation timing controls, and optional Umami analytics configuration managed in `_data/site.yml`
-- GitHub snippet embedding via a `{% raw %}{% github %}{% endraw %}` shortcode that fetches, highlights, and caches remote code
+- Social preview images generated at build times
+- GitHub snippet embedding via a `{% github %}` shortcode that fetches, highlights, and caches remote code
 
 ## Quick Start
 
@@ -72,7 +73,7 @@ This sets `ELEVENTY_ENV=production` and writes the static output to the `_site/`
 
 - `title`, `url`, and author contact details.
 - `theme` block toggles the selector (`showSelectors`), controls animation timings, and sets the default theme (`defaultId`).
-- `umami-tracking` block (optional) controls the analytics script URL and `website-id`; remove or comment it out to disable tracking.
+- `umami` block (optional) controls the analytics script URL (`source`) and tracking `id`; remove or comment it out to disable tracking.
 
 ### Comments (`giscus`)
 
