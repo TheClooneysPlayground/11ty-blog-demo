@@ -13,7 +13,7 @@
     - black
     - bg-washed-yellow
   midtoneClass: gold
-  accent: "#FFB700"
+  accent: "#E7040F"
 - id: mint
   label: Mint (black / washed-green)
   classes:
