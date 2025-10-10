@@ -1,5 +1,7 @@
 // 11ty Nav
 import eleventyNavigationPlugin from '@11ty/eleventy-navigation';
+// 11ty RSS
+import eleventyPluginRss from '@11ty/eleventy-plugin-rss';
 // 11ty Img
 import { eleventyImageTransformPlugin } from '@11ty/eleventy-img';
 import EleventyFetch from '@11ty/eleventy-fetch';
@@ -176,6 +178,7 @@ export default function (eleventyConfig) {
   });
 
   eleventyConfig.addPlugin(eleventyNavigationPlugin);
+  eleventyConfig.addPlugin(eleventyPluginRss);
   eleventyConfig.addPlugin(eleventyImageTransformPlugin, {
     formats: ['avif', 'webp', 'jpeg'],
     widths: [320, 640, 960, 1280],
