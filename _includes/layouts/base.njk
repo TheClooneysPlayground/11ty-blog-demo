@@ -45,6 +45,7 @@
 <head>
 	{% include "layouts/partials/head-seo.njk" %}
 	{% include "layouts/partials/theme-styles.njk" %}
+	{% include "layouts/partials/theme-init-script.njk" %}
 
 	{% if environment != 'development' %}
 		{% include "layouts/partials/analytics-tracking-script.njk" %}
@@ -55,7 +56,6 @@
 	<main>
 		{{ content | safe }}
 	</main>
-	{% include "layouts/partials/theme-init-script.njk" %}
 	{% include "layouts/partials/theme-preview-script.njk" %}
 	<script src="/assets/js/copy.js" defer></script>
 </body>
