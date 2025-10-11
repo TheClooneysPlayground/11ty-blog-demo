@@ -14,7 +14,7 @@ That mix finally landed this week: a `{% raw %}{% github %}{% endraw %}` shortco
 
 ## Goals and Constraints
 
-I set a few guardrails before writing any code:
+I set a few guardrails before having GPT Codex write any code:
 
 - **Stay build-time friendly.** Everything should be resolved during the Eleventy
   build so the rendered HTML already contains the code (great for search engines,
