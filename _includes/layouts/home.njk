@@ -21,6 +21,7 @@ layout: layouts/base.njk
 {% set siteThemeConfig = site.theme or {} %}
 {% set showThemeSelectors = siteThemeConfig.showSelectors if siteThemeConfig.showSelectors is defined else true %}
 {% set giscusConfig = site.giscus or {} %}
+{% set headerLinks = site.headerLinks if site.headerLinks is defined else [] %}
 
 <div class="sans-serif">
   <style>
@@ -84,19 +85,64 @@ layout: layouts/base.njk
     .theme .theme-text:active {
       color: inherit;
     }
+    @media screen and (min-width: 30em) {
+      [data-theme-selector] {
+        position: relative;
+      }
+      [data-theme-selector]::after {
+        content: '';
+        display: inline-block;
+        margin-left: 0.25rem;
+        border-left: 4px solid transparent;
+        border-right: 4px solid transparent;
+        border-top: 5px solid currentColor;
+        transition: transform 0.2s ease;
+      }
+      [data-theme-selector]:hover::after,
+      [data-theme-selector]:focus-within::after {
+        transform: rotate(180deg);
+      }
+      [data-theme-selector] .theme-preview-button {
+        display: none;
+      }
+      [data-theme-selector] .theme-preview-button[data-active] {
+        display: flex;
+      }
+      [data-theme-selector]:hover .theme-preview-button,
+      [data-theme-selector]:focus-within .theme-preview-button {
+        display: flex;
+      }
+    }
   </style>
 
   <!-- Site Title + Mobile Hamburger -->
   <div class="pa4 flex items-center justify-between flex-wrap">
-    <a href="/" class="link dim f3 f2-ns fw6 ma0 tr tl-ns db theme-text">
-      {{ site.title }}
-    </a>
+    <div class="flex items-center flex-wrap w-100 w-auto-ns">
+      <a href="/" class="link dim f3 f2-ns fw6 ma0 tr tl-ns db theme-text">
+        {{ site.title }}
+      </a>
+      {% if headerLinks | length %}
+        <ul class="list pl0 ma0 flex items-center flex-wrap w-100 w-auto-ns mt2 mt0-ns ml0 ml3-ns">
+          {% for link in headerLinks %}
+            <li class="mr3 mb2 mb0-ns">
+              <a href="{{ link.url }}"
+                 class="link dim f6 fw5 theme-text"
+                 {% if link.rel %}rel="{{ link.rel }}"{% endif %}
+                 {% if link.title %}title="{{ link.title }}"{% endif %}
+                 {% if link.target %}target="{{ link.target }}"{% endif %}>
+                {{ link.label }}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
     <div class="flex items-center mt3 mt0-ns flex-wrap justify-end">
       {% if showThemeSelectors %}
-      <div class="flex items-center flex-wrap">
+      <div class="flex items-center flex-wrap" data-theme-selector>
         {% for theme in themes %}
           <button type="button"
-                  class="w2 h2 bn pointer br2 mr2 mb2 pa0 ba b--transparent bg-transparent flex items-center justify-center"
+                  class="theme-preview-button w2 h2 bn pointer br2 mr2 mb2 pa0 ba b--transparent bg-transparent flex items-center justify-center"
                   data-theme-preview="{{ theme.id }}"{% if loop.first %} data-active{% endif %}
                   aria-label="Preview {{ theme.label }} theme">
             <span class="w-100 h-100 br2 flex items-center justify-center {{ theme.classes | join(' ') }}">
