@@ -117,16 +117,16 @@ layout: layouts/base.njk
 
   <!-- Site Title + Mobile Hamburger -->
   <div class="pa4 flex items-center justify-between flex-wrap">
-    <div class="flex items-center flex-wrap w-100 w-auto-ns">
-      <a href="/" class="link dim f3 f2-ns fw6 ma0 tr tl-ns db theme-text">
-        {{ site.title }}
-      </a>
-      {% if headerLinks | length %}
-        <ul class="list pl0 ma0 flex items-center flex-wrap w-100 w-auto-ns mt2 mt0-ns ml0 ml3-ns">
+    <a href="/" class="link dim f3 f2-ns fw6 ma0 tr tl-ns db theme-text">
+      {{ site.title }}
+    </a>
+    {% if headerLinks | length %}
+      <div class="flex items-center justify-center flex-wrap flex-auto w-100 w-auto-ns mt3 mt0-ns">
+        <ul class="list pl0 ma0 flex items-center flex-wrap justify-center mb0" style="gap: 0.5rem;">
           {% for link in headerLinks %}
-            <li class="mr3 mb2 mb0-ns">
+            <li>
               <a href="{{ link.url }}"
-                 class="link dim f6 fw5 theme-text"
+                 class="link dim underline f5 f4-ns fw5 theme-text"
                  {% if link.rel %}rel="{{ link.rel }}"{% endif %}
                  {% if link.title %}title="{{ link.title }}"{% endif %}
                  {% if link.target %}target="{{ link.target }}"{% endif %}>
@@ -135,11 +135,11 @@ layout: layouts/base.njk
             </li>
           {% endfor %}
         </ul>
-      {% endif %}
-    </div>
+      </div>
+    {% endif %}
     <div class="flex items-center mt3 mt0-ns flex-wrap justify-end">
       {% if showThemeSelectors %}
-      <div class="flex items-center flex-wrap" data-theme-selector>
+      <div class="flex items-center flex-nowrap ml3-ns ml2" data-theme-selector>
         {% for theme in themes %}
           <button type="button"
                   class="theme-preview-button w2 h2 bn pointer br2 mr2 mb2 pa0 ba b--transparent bg-transparent flex items-center justify-center"

@@ -14,9 +14,14 @@ theme:
   defaultId: sun
 
 headerLinks:
+  - label: GitHub
+    url: https://github.com/TheClooneyCollection/11ty-subspace-builder
+  - label: Nicholas's Blog
+    url: https://blog.nicholas.clooney.io/
   - label: Mastodon
     url: https://mastodon.social/@NicholasClooney
     rel: me
+
 
 # tracking with umami
 umami:
