@@ -131,9 +131,12 @@
 				button.addEventListener(leaveEvent, cancelPreview);
 				button.addEventListener('focus', () => previewTheme(themeId));
 				button.addEventListener('blur', cancelPreview);
-				button.addEventListener('click', () => {
+				button.addEventListener('click', event => {
 					clearPreviewReset();
 					applyTheme(themeId);
+					if (event && event.detail && event.detail > 0) {
+						button.blur();
+					}
 				});
 			});
 
