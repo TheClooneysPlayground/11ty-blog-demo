@@ -20,6 +20,8 @@ layout: layouts/base.njk
 
 {% set siteThemeConfig = site.theme or {} %}
 {% set showThemeSelectors = siteThemeConfig.showSelectors if siteThemeConfig.showSelectors is defined else true %}
+{% set defaultTheme = themes | first %}
+{% set defaultThemeId = siteThemeConfig.defaultId if siteThemeConfig.defaultId is defined else (defaultTheme.id if defaultTheme is defined else null) %}
 {% set giscusConfig = site.giscus or {} %}
 {% set headerLinks = site.headerLinks if site.headerLinks is defined else [] %}
 
@@ -140,10 +142,10 @@ layout: layouts/base.njk
     <div class="flex items-center mt3 mt0-ns flex-wrap justify-end">
       {% if showThemeSelectors %}
       <div class="flex items-center flex-nowrap ml3-ns ml2" data-theme-selector>
-        {% for theme in themes %}
+        {% for theme in themes | reverse %}
           <button type="button"
                   class="theme-preview-button w2 h2 bn pointer br2 mr2 mb2 pa0 ba b--transparent bg-transparent flex items-center justify-center"
-                  data-theme-preview="{{ theme.id }}"{% if loop.first %} data-active{% endif %}
+                  data-theme-preview="{{ theme.id }}"{% if theme.id == defaultThemeId %} data-active{% endif %}
                   aria-label="Preview {{ theme.label }} theme">
             <span class="w-100 h-100 br2 flex items-center justify-center {{ theme.classes | join(' ') }}">
               Aa

@@ -2,7 +2,7 @@
 {% set configuredDefaultThemeId = siteThemeConfig.defaultId %}
 {% set defaultTheme = themes | first %}
 {% if configuredDefaultThemeId %}
-	{% for theme in themes %}
+	{% for theme in themes  %}
 		{% if theme.id == configuredDefaultThemeId %}
 			{% set defaultTheme = theme %}
 		{% endif %}

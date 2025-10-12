@@ -1,12 +1,5 @@
 # https://tachyons.io/docs/themes/skins/
 
-- id: default
-  label: Default
-  classes:
-    - black
-    - bg-white
-  midtoneClass: mid-gray
-  accent: "#00449E"
 - id: sun
   label: Sun (black / washed-yellow)
   classes:
@@ -14,6 +7,13 @@
     - bg-washed-yellow
   midtoneClass: gold
   accent: "#E7040F"
+- id: default
+  label: Default
+  classes:
+    - black
+    - bg-white
+  midtoneClass: mid-gray
+  accent: "#00449E"
 - id: mint
   label: Mint (black / washed-green)
   classes:
